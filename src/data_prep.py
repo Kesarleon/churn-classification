@@ -2,27 +2,31 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
 
-def load_data(path="data/churn_data.csv"):
+from . import config
+
+def load_data(path=config.DATA_PATH):
     return pd.read_csv(path)
 
 def create_preprocessor():
-    numeric_features = ["age", "tenure", "monthly_charges"]
-    categorical_features = ["contract_type", "internet_service"]
-
     numeric_transformer = StandardScaler()
     categorical_transformer = OneHotEncoder(handle_unknown="ignore")
 
     preprocessor = ColumnTransformer(
         transformers=[
-            ("num", numeric_transformer, numeric_features),
-            ("cat", categorical_transformer, categorical_features),
-        ]
+            ("num", numeric_transformer, config.NUMERIC_FEATURES),
+            ("cat", categorical_transformer, config.CATEGORICAL_FEATURES),
+        ],
+        remainder="passthrough"  # Keep other columns if any
     )
     return preprocessor
 
 def split_data(df):
-    X = df.drop(columns=["churn", "customer_id"])
-    y = df["churn"]
-    return train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+    X = df.drop(columns=[config.TARGET, config.CUSTOMER_ID])
+    y = df[config.TARGET]
+    return train_test_split(
+        X, y,
+        test_size=config.TEST_SIZE,
+        random_state=config.RANDOM_STATE,
+        stratify=y
+    )
