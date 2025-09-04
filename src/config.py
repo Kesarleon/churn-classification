@@ -4,6 +4,7 @@
 DATA_PATH = "data/churn_data.csv"
 MODEL_PATH = "models/churn_model.pkl"
 METADATA_PATH = "models/metadata.json"
+CONFUSION_MATRIX_PATH = "models/confusion_matrix.png"
 
 # --- Variables del Modelo ---
 TARGET = "churn"

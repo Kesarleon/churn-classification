@@ -108,3 +108,17 @@ El proyecto incluye una API creada con FastAPI para servir el modelo.
       "churn_prediction": 0
     }
     ```
+
+## 📊 Dashboard de Monitoreo
+
+El proyecto también incluye un dashboard interactivo creado con Streamlit para visualizar el rendimiento del último modelo entrenado.
+
+1.  **Asegúrate de que los artefactos del modelo existan:**
+    Si no lo has hecho, ejecuta el script de entrenamiento (`python -m src.train`) para generar los archivos `models/metadata.json` y `models/confusion_matrix.png`.
+
+2.  **Inicia la aplicación del dashboard:**
+    ```bash
+    streamlit run src/dashboard.py
+    ```
+
+    Esto abrirá una nueva pestaña en tu navegador con el dashboard interactivo.
