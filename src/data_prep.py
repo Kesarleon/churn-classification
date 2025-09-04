@@ -1,6 +1,8 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 
 from . import config
@@ -9,15 +11,25 @@ def load_data(path=config.DATA_PATH):
     return pd.read_csv(path)
 
 def create_preprocessor():
-    numeric_transformer = StandardScaler()
-    categorical_transformer = OneHotEncoder(handle_unknown="ignore")
+    # Pipeline para transformar variables numéricas: imputar y escalar
+    numeric_pipeline = Pipeline(steps=[
+        ('imputer', SimpleImputer(strategy='median')),
+        ('scaler', StandardScaler())
+    ])
 
+    # Pipeline para transformar variables categóricas: imputar y codificar
+    categorical_pipeline = Pipeline(steps=[
+        ('imputer', SimpleImputer(strategy='most_frequent')),
+        ('onehot', OneHotEncoder(handle_unknown='ignore'))
+    ])
+
+    # ColumnTransformer para aplicar las transformaciones correctas a cada tipo de columna
     preprocessor = ColumnTransformer(
         transformers=[
-            ("num", numeric_transformer, config.NUMERIC_FEATURES),
-            ("cat", categorical_transformer, config.CATEGORICAL_FEATURES),
+            ('num', numeric_pipeline, config.NUMERIC_FEATURES),
+            ('cat', categorical_pipeline, config.CATEGORICAL_FEATURES)
         ],
-        remainder="passthrough"  # Keep other columns if any
+        remainder='passthrough'
     )
     return preprocessor
 

@@ -25,7 +25,10 @@ def train_model():
     preprocessor = create_preprocessor()
     model = Pipeline(steps=[
         ("preprocessor", preprocessor),
-        ("classifier", LogisticRegression(max_iter=config.MAX_ITER))
+        ("classifier", LogisticRegression(
+            max_iter=config.MAX_ITER,
+            class_weight='balanced'
+        ))
     ])
 
     # 3. Entrenar
