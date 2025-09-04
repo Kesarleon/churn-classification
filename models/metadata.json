@@ -1,0 +1,34 @@
+{
+    "created_at": "2025-09-04T18:25:43.293306",
+    "metrics": {
+        "accuracy": 0.735,
+        "f1_score": 0.0,
+        "report": {
+            "0": {
+                "precision": 0.735,
+                "recall": 1.0,
+                "f1-score": 0.8472622478386167,
+                "support": 147.0
+            },
+            "1": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 53.0
+            },
+            "accuracy": 0.735,
+            "macro avg": {
+                "precision": 0.3675,
+                "recall": 0.5,
+                "f1-score": 0.42363112391930835,
+                "support": 200.0
+            },
+            "weighted avg": {
+                "precision": 0.540225,
+                "recall": 0.735,
+                "f1-score": 0.6227377521613833,
+                "support": 200.0
+            }
+        }
+    }
+}
