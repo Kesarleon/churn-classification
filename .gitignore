@@ -78,3 +78,6 @@ ENV/
 # Visual Studio Code
 .vscode/
 .history/
+
+# Model artifacts
+models/*.pkl
