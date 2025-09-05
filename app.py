@@ -84,15 +84,15 @@ if df is not None:
     with col1:
         st.write("#### Distribución de Antigüedad (tenure) por Churn")
         fig1 = px.histogram(df, x="tenure", color="churn", barmode="overlay",
-                            title="Distribución de Antigüedad vs. Churn",
-                            labels={"churn": "Churn", "tenure": "Antigüedad (meses)"})
+                                title="Distribución de Antigüedad vs. Churn",
+                                labels={"churn": "Churn", "tenure": "Antigüedad (meses)"})
         st.plotly_chart(fig1, use_container_width=True)
 
     with col2:
         st.write("#### Cargos Mensuales por Churn")
         fig2 = px.box(df, x="churn", y="monthly_charges", color="churn",
-                      title="Cargos Mensuales vs. Churn",
-                      labels={"churn": "Churn", "monthly_charges": "Cargos Mensuales"})
+                          title="Cargos Mensuales vs. Churn",
+                          labels={"churn": "Churn", "monthly_charges": "Cargos Mensuales"})
         st.plotly_chart(fig2, use_container_width=True)
 else:
     st.info("No se pueden mostrar las visualizaciones porque el dataset no se ha cargado.")
