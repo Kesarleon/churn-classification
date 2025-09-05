@@ -10,7 +10,7 @@ from config import METADATA_PATH, CONFUSION_MATRIX_PATH
 st.set_page_config(page_title="Dashboard de Desempeño del Modelo de Churn", layout="wide")
 
 st.title("📊 Dashboard de Desempeño del Modelo de Churn")
-st.write("Este dashboard muestra las métricas de rendimiento del último modelo entrenado.")
+st.write("Este dashboard muestra las métricas de rendimiento del **mejor modelo** seleccionado tras una competición.")
 
 try:
     # --- Cargar Artefactos ---
@@ -19,16 +19,19 @@ try:
 
     confusion_matrix_img = Image.open(CONFUSION_MATRIX_PATH)
 
+    # --- Mostrar Información del Mejor Modelo ---
+    st.header(f"🏆 Mejor Modelo: `{metadata['metrics']['model_name']}`")
+
     # --- Mostrar Métricas ---
-    st.header("Métricas Clave")
+    st.subheader("Métricas Clave")
     col1, col2 = st.columns(2)
     col1.metric("Accuracy Score", f"{metadata['metrics']['accuracy']:.4f}")
     col2.metric("F1 Score (Ponderado)", f"{metadata['metrics']['f1_score']:.4f}")
 
-    st.header("Matriz de Confusión")
+    st.subheader("Matriz de Confusión")
     st.image(confusion_matrix_img, caption="Matriz de Confusión del conjunto de prueba.")
 
-    st.header("Reporte de Clasificación")
+    st.subheader("Reporte de Clasificación")
     report_df = pd.DataFrame(metadata['metrics']['report']).transpose()
     st.dataframe(report_df)
 

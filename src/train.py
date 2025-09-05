@@ -3,7 +3,6 @@ import logging
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import classification_report, accuracy_score, f1_score, confusion_matrix
 
@@ -27,49 +26,74 @@ def save_confusion_matrix_plot(y_true, y_pred, path):
     logging.info(f"Matriz de confusión guardada en {path}")
 
 def train_model():
-    logging.info("--- Inicio del pipeline de entrenamiento ---")
+    logging.info("--- Inicio del pipeline de entrenamiento y competición de modelos ---")
 
-    # 1. Cargar datos
-    logging.info("Paso 1: Cargando datos...")
+    # 1. Cargar y preparar datos
+    logging.info("Paso 1: Cargando y preparando datos...")
     df = load_data()
     X_train, X_test, y_train, y_test = split_data(df)
-    logging.info(f"Datos cargados: {len(X_train)} muestras de entrenamiento, {len(X_test)} muestras de prueba.")
-
-    # 2. Crear pipeline
-    logging.info("Paso 2: Creando el pipeline de preprocesamiento y modelo...")
     preprocessor = create_preprocessor()
-    model = Pipeline(steps=[
-        ("preprocessor", preprocessor),
-        ("classifier", LogisticRegression(
-            max_iter=config.MAX_ITER,
-            class_weight='balanced'
-        ))
-    ])
+    logging.info("Datos listos para el entrenamiento.")
 
-    # 3. Entrenar
-    logging.info("Paso 3: Entrenando el modelo...")
-    model.fit(X_train, y_train)
-    logging.info("Entrenamiento completado.")
+    best_model = None
+    best_metric = -1
+    best_model_name = ""
+    best_model_metrics = {}
 
-    # 4. Evaluar
-    logging.info("Paso 4: Evaluando el modelo...")
-    y_pred = model.predict(X_test)
-    cm = confusion_matrix(y_test, y_pred)
-    metrics = {
-        "accuracy": accuracy_score(y_test, y_pred),
-        "f1_score": f1_score(y_test, y_pred),
-        "confusion_matrix": cm.tolist(), # Convertir a lista para que sea serializable en JSON
-        "report": classification_report(y_test, y_pred, output_dict=True)
-    }
-    logging.info("Reporte de clasificación:\n" + classification_report(y_test, y_pred))
+    # 2. Competición de modelos
+    logging.info("Paso 2: Iniciando competición de modelos...")
+    for name, model in config.MODELS.items():
+        logging.info(f"--- Entrenando y evaluando: {name} ---")
 
-    # 5. Guardar modelo, metadata y visualizaciones
-    logging.info("Paso 5: Guardando artefactos del modelo...")
-    joblib.dump(model, config.MODEL_PATH)
-    save_metadata(metrics, config.METADATA_PATH)
-    save_confusion_matrix_plot(y_test, y_pred, config.CONFUSION_MATRIX_PATH)
+        # Crear pipeline para el modelo actual
+        pipeline = Pipeline(steps=[
+            ("preprocessor", preprocessor),
+            ("classifier", model)
+        ])
 
-    logging.info("--- Fin del pipeline de entrenamiento ---")
+        # Entrenar
+        pipeline.fit(X_train, y_train)
+
+        # Evaluar
+        y_pred = pipeline.predict(X_test)
+        metric_value = f1_score(y_test, y_pred) # Usando F1 como métrica principal
+
+        logging.info(f"Modelo: {name}, F1-Score: {metric_value:.4f}")
+
+        # Guardar el mejor modelo
+        if metric_value > best_metric:
+            best_metric = metric_value
+            best_model = pipeline
+            best_model_name = name
+
+            # Guardar todas las métricas del mejor modelo
+            cm = confusion_matrix(y_test, y_pred)
+            best_model_metrics = {
+                "model_name": name,
+                "accuracy": accuracy_score(y_test, y_pred),
+                "f1_score": f1_score(y_test, y_pred),
+                "confusion_matrix": cm.tolist(),
+                "report": classification_report(y_test, y_pred, output_dict=True)
+            }
+            logging.info(f"¡Nuevo mejor modelo encontrado!: {name} con F1-Score de {best_metric:.4f}")
+
+    logging.info(f"--- Competición finalizada. Mejor modelo: {best_model_name} ---")
+
+    # 3. Guardar el mejor modelo y sus artefactos
+    if best_model:
+        logging.info("Paso 3: Guardando el mejor modelo y sus artefactos...")
+        joblib.dump(best_model, config.MODEL_PATH)
+        save_metadata(best_model_metrics, config.METADATA_PATH)
+
+        # Re-generar y_pred del mejor modelo para la matriz de confusión
+        y_pred_best = best_model.predict(X_test)
+        save_confusion_matrix_plot(y_test, y_pred_best, config.CONFUSION_MATRIX_PATH)
+
+        logging.info("Artefactos del mejor modelo guardados correctamente.")
+    else:
+        logging.warning("No se encontró ningún modelo para guardar.")
+
+    logging.info("--- Fin del pipeline ---")
 
 if __name__ == "__main__":
     train_model()

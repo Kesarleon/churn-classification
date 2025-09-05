@@ -60,8 +60,8 @@ Puedes ejecutar los diferentes componentes del pipeline desde la raíz del proye
     python -m src.generate_data
     ```
 
-2.  **Entrenar el modelo:**
-    Este comando ejecutará el pipeline completo: cargará los datos, los preprocesará, entrenará un modelo de Regresión Logística, y guardará el modelo entrenado y sus métricas en la carpeta `models/`.
+2.  **Entrenar y Seleccionar el Mejor Modelo:**
+    Este comando ejecutará un pipeline de entrenamiento que pone a competir varios modelos (Regresión Logística, Random Forest, XGBoost). Seleccionará automáticamente el mejor modelo basado en el F1-score, y guardará únicamente los artefactos (modelo, métricas, visualizaciones) del modelo ganador en la carpeta `models/`.
     ```bash
     python -m src.train
     ```
