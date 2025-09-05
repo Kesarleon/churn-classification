@@ -78,7 +78,3 @@ ENV/
 # Visual Studio Code
 .vscode/
 .history/
-
-# Model artifacts
-models/*.pkl
-models/metadata.json
